@@ -1,5 +1,24 @@
 # Jev vs Claude: tool-selection A/B
 
+**Interactive results:** https://tubaali.github.io/jev-vs-claude/
+
+## Results (125 synthetic requests × 5 runs, 32 mock tools)
+
+| Side | Right tool | Median latency | Claude $ / 1k picks |
+|---|---|---|---|
+| TypeSafe Jev 1.13.0 | 93.3% | 156 ms | (TypeSafe credit) |
+| Claude Sonnet 5.5, first tool call | 67.4% | 2.3 s | $2.05 |
+| Claude Sonnet 5.5, final action (searches allowed) | 83.7% | 3.3 s | $6.63 |
+
+- Most of Claude's first-pick "misses" were a search to find the email, event or file before acting. Counting those, its first pick reaches 95.2%.
+- Jev was never very sure (≥ 0.9) and wrong. "Jev first, Claude when Jev is unsure" (τ ≈ 0.5) scored 94.2%.
+- Nobody picked the harmful tool on the trick emails.
+- On ambiguous requests, the final-action run under-scores Claude: it often searched and then opened a result, and the opening step was recorded.
+
+Raw rows: `results/results.jsonl` (experiments `tc32` and `tc32-final`). Tables: `results/summary.md`.
+Run the final-action variant with `python run_ab.py --runs 5 --arms claude --claude-mode final`.
+
+
 Question: given a user request and a catalog of tools, which picks the right tool better,
 faster, cheaper, and with more trustworthy confidence:
 **Claude (native tool calling via the Agent SDK)** or **TypeSafe Jev (one `Choice` question)**?
